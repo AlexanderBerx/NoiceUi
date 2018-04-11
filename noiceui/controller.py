@@ -10,7 +10,13 @@ class NoiceController(QtCore.QObject):
     def __init__(self):
         super(NoiceController, self).__init__()
         self._view = NoiceWindow()
+        self._model = None
+
         self._connect_signals()
+        self._bind_model()
+
+    def _bind_model(self):
+        pass
 
     def _connect_signals(self):
         self._view.signal_browse_noice_app.connect(self.browse_noice_app)
