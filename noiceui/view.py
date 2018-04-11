@@ -122,3 +122,6 @@ class NoiceWindow(QtWidgets.QWidget):
 
     def set_aov_model(self, model):
         self._lst_aovs.setModel(model)
+
+    def set_input_model(self, model):
+        self._lst_input.setModel(model)
