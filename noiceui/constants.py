@@ -1,1 +1,1 @@
-RSC_FILE = '../bin/drr_resources.rcc'
+RSC_FILE = '../bin/resources.rcc'
