@@ -14,6 +14,7 @@ class NoiceWindow(QtWidgets.QWidget):
     signal_remove_input = QtCore.Signal()
     signal_browse_output = QtCore.Signal()
     signal_run = QtCore.Signal()
+    signal_window_close = QtCore.Signal()
 
     def __init__(self):
         super(NoiceWindow, self).__init__()
@@ -83,7 +84,6 @@ class NoiceWindow(QtWidgets.QWidget):
         aov_options_layout.setAlignment(self._btn_remove_aov, QtCore.Qt.AlignTop)
         layout.addLayout(aov_options_layout, 3, 2)
 
-
         layout.addWidget(QtWidgets.QLabel('Input:'), 4, 0)
         self._lst_input = QtWidgets.QListView()
         layout.addWidget(self._lst_input, 4, 1)
@@ -116,7 +116,7 @@ class NoiceWindow(QtWidgets.QWidget):
         self._btn_run.clicked.connect(self.signal_run)
         return self._btn_run
 
-    # mutators
+    # mutator's
     def set_noice_app(self, path_to_app):
         self._txt_noice_app.setText(path_to_app)
 
@@ -125,3 +125,14 @@ class NoiceWindow(QtWidgets.QWidget):
 
     def set_input_model(self, model):
         self._lst_input.setModel(model)
+
+    # accessors
+    def get_noice_app(self):
+        return self._txt_noice_app.text()
+
+    def closeEvent(self, *args, **kwargs):
+        self.signal_window_close.emit()
+        super(NoiceWindow, self).closeEvent(*args, **kwargs)
+
+
+
