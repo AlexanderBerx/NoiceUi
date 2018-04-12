@@ -117,11 +117,20 @@ class NoiceController(QtCore.QObject):
     def _get_cmd(self):
         cmd = ''
         cmd += '"{}" '.format(os.path.normpath(self._view.get_noice_app()))
-        cmd += '-pr {} '.format(self._view.get_patch_radius())
-        cmd += '-sr {} '.format(self._view.get_search_radius())
-        cmd += '-v {} '.format(self._view.get_variance())
+        if self._view.get_patch_radius():
+            cmd += '-pr {} '.format(self._view.get_patch_radius())
+
+        if self._view.get_search_radius():
+            cmd += '-sr {} '.format(self._view.get_search_radius())
+
+        if self._view.get_variance():
+            cmd += '-v {} '.format(self._view.get_variance())
+
         cmd += ''.join(['-i "{}" '.format(item) for item in self._model.get_input_list()])
-        cmd += ''.join(['-l "{}" '.format(item) for item in self._model.get_input_list()])
-        cmd += '-o  "{}" '.format(self._view.get_output())
+
+        if self._model.get_aov_list():
+            cmd += ''.join(['-l "{}" '.format(item) for item in self._model.get_aov_list()])
+
+        cmd += '-o "{}" '.format(self._view.get_output())
 
         return cmd
