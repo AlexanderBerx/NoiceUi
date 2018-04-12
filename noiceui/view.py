@@ -9,7 +9,7 @@ class NoiceWindow(QtWidgets.QWidget):
     signal_browse_noice_app = QtCore.Signal()
     signal_reset = QtCore.Signal()
     signal_add_aov = QtCore.Signal()
-    signal_remove_aov = QtCore.Signal()
+    signal_remove_aov = QtCore.Signal(list)
     signal_add_input = QtCore.Signal()
     signal_remove_input = QtCore.Signal()
     signal_browse_output = QtCore.Signal()
@@ -79,7 +79,7 @@ class NoiceWindow(QtWidgets.QWidget):
 
         self._btn_remove_aov = QtWidgets.QPushButton()
         self._btn_remove_aov.setIcon(QtGui.QIcon(':/minus_icon'))
-        self._btn_remove_aov.clicked.connect(self.signal_remove_aov)
+        self._btn_remove_aov.clicked.connect(self._signal_aov_removal)
         aov_options_layout.addWidget(self._btn_remove_aov)
         aov_options_layout.setAlignment(self._btn_remove_aov, QtCore.Qt.AlignTop)
         layout.addLayout(aov_options_layout, 3, 2)
@@ -96,7 +96,7 @@ class NoiceWindow(QtWidgets.QWidget):
 
         self._btn_remove_input = QtWidgets.QPushButton()
         self._btn_remove_input.setIcon(QtGui.QIcon(':/minus_icon'))
-        self._btn_remove_input.clicked.connect(self.signal_remove_input)
+        self._btn_remove_input.clicked.connect(self._signal_aov_removal)
         input_options_layout.addWidget(self._btn_remove_input)
         input_options_layout.setAlignment(self._btn_remove_input, QtCore.Qt.AlignTop)
         layout.addLayout(input_options_layout, 4, 2)
@@ -116,9 +116,23 @@ class NoiceWindow(QtWidgets.QWidget):
         self._btn_run.clicked.connect(self.signal_run)
         return self._btn_run
 
+    # other
+    @QtCore.Slot()
+    def _signal_aov_removal(self):
+        self.signal_remove_aov.emit(self._lst_aovs.selectedIndexes())
+
     # mutator's
-    def set_noice_app(self, path_to_app):
-        self._txt_noice_app.setText(path_to_app)
+    def set_noice_app(self, value):
+        self._txt_noice_app.setText(value)
+
+    def set_patch_radius(self, value):
+        self._spnb_patch_radius.setValue(int(value))
+
+    def set_search_radius(self, value):
+        return self._spnb_search_radius.setValue(int(value))
+
+    def set_variance(self, value):
+        return self._spnb_variance.setValue(float(value))
 
     def set_aov_model(self, model):
         self._lst_aovs.setModel(model)
@@ -129,6 +143,16 @@ class NoiceWindow(QtWidgets.QWidget):
     # accessors
     def get_noice_app(self):
         return self._txt_noice_app.text()
+
+    def get_patch_radius(self):
+        return self._spnb_patch_radius.value()
+
+    def get_search_radius(self):
+        return self._spnb_search_radius.value()
+
+    def get_variance(self):
+        return self._spnb_variance.value()
+
 
     def closeEvent(self, *args, **kwargs):
         self.signal_window_close.emit()

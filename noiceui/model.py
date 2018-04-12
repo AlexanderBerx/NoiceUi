@@ -21,5 +21,30 @@ class NoiceModel(object):
         item = QtGui.QStandardItem(aov)
         self._aov_model.appendRow(item)
 
+    def remove_aov(self, index):
+        """
+        :param QtCore.QModelIndex index:
+        :return:
+        """
+        self._aov_model.removeRow(index.row())
+
+    def get_aov_names(self):
+        """
+        :return: list
+        """
+        names = []
+        for index in range(self._aov_model.rowCount()):
+            item = self._aov_model.item(index)  #type:QtGui.QStandardItem
+            names.append(item.text())
+
+        return names
+
     def add_input(self, input_):
         self._input_model.append(input_)
+
+    def remove_input(self, index):
+        """
+        :param QtCore.QModelIndex index:
+        :return:
+        """
+        self._input_model.removeRow(index.row())

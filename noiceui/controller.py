@@ -27,12 +27,23 @@ class NoiceController(QtCore.QObject):
         self._view.signal_reset.connect(self.reset)
         self._view.signal_add_aov.connect(self.add_aov)
         self._view.signal_window_close.connect(self.window_close)
+        self._view.signal_remove_aov[list].connect(self.remove_aovs)
 
     def _load_prefs(self):
         self._view.set_noice_app(self._prefs.noice_app)
+        self._view.set_patch_radius(self._prefs.patch_radius)
+        self._view.set_search_radius(self._prefs.search_radius)
+        self._view.set_variance(self._prefs.variance)
+
+        for aov in self._prefs.aovs:
+            self._model.add_aov(aov)
 
     def _save_prefs(self):
         self._prefs.noice_app = self._view.get_noice_app()
+        self._prefs.patch_radius = self._view.get_patch_radius()
+        self._prefs.search_radius = self._view.get_search_radius()
+        self._prefs.variance = self._view.get_variance()
+        self._prefs.aovs = self._model.get_aov_names()
 
     # slots
     @QtCore.Slot()
@@ -54,6 +65,11 @@ class NoiceController(QtCore.QObject):
         prompt.setOkButtonText('Add')
         if prompt.exec_():
             self._model.add_aov(prompt.textValue())
+
+    @QtCore.Slot(list)
+    def remove_aovs(self, aovs):
+        for item in aovs:
+            self._model.remove_aov(item)
 
     @QtCore.Slot()
     def window_close(self):

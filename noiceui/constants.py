@@ -4,3 +4,7 @@ APP_NAME = 'NoiceUi'
 
 # pref keys
 PREF_NOICE_APP = 'NoiceApp'
+PREF_PATCH_RADIUS = 'PatchRadius'
+PREF_SEARCH_RADIUS = 'SearchRadius'
+PREF_VARIANCE = 'Variance'
+PREF_AOVS = 'AOVS'
