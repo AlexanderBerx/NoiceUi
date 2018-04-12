@@ -3,6 +3,8 @@ try:
 except ImportError:
     from Qt import QtWidgets, QtCore
 
+import os
+import subprocess
 from noiceui.view import NoiceWindow
 from noiceui.model import NoiceModel
 from noiceui.prefs import NoicePrefs
@@ -28,6 +30,10 @@ class NoiceController(QtCore.QObject):
         self._view.signal_add_aov.connect(self.add_aov)
         self._view.signal_window_close.connect(self.window_close)
         self._view.signal_remove_aov[list].connect(self.remove_aovs)
+        self._view.signal_add_input.connect(self.add_input)
+        self._view.signal_remove_input[list].connect(self.remove_inputs)
+        self._view.signal_browse_output.connect(self.browse_output)
+        self._view.signal_run.connect(self.run_noice)
 
     def _load_prefs(self):
         self._view.set_noice_app(self._prefs.noice_app)
@@ -35,15 +41,22 @@ class NoiceController(QtCore.QObject):
         self._view.set_search_radius(self._prefs.search_radius)
         self._view.set_variance(self._prefs.variance)
 
-        for aov in self._prefs.aovs:
-            self._model.add_aov(aov)
+        for item in self._prefs.aovs:
+            self._model.add_aov(item)
+
+        for item in self._prefs.inputs:
+            self._model.add_input(item)
+
+        self._view.set_output(self._prefs.output)
 
     def _save_prefs(self):
         self._prefs.noice_app = self._view.get_noice_app()
         self._prefs.patch_radius = self._view.get_patch_radius()
         self._prefs.search_radius = self._view.get_search_radius()
         self._prefs.variance = self._view.get_variance()
-        self._prefs.aovs = self._model.get_aov_names()
+        self._prefs.aovs = self._model.get_aov_list()
+        self._prefs.inputs = self._model.get_input_list()
+        self._prefs.output = self._view.get_output()
 
     # slots
     @QtCore.Slot()
@@ -72,10 +85,43 @@ class NoiceController(QtCore.QObject):
             self._model.remove_aov(item)
 
     @QtCore.Slot()
+    def add_input(self):
+        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self._view, 'Add input', filter='*.exr *.EXR')
+        for item in files:
+            self._model.add_input(item)
+
+    @QtCore.Slot(list)
+    def remove_inputs(self, inputs):
+        for item in inputs:
+            self._model.remove_input(item)
+
+    @QtCore.Slot()
+    def browse_output(self):
+        file_, _ = QtWidgets.QFileDialog.getSaveFileName(self._view, 'Set output', filter='*.exr *.EXR')
+        if file_:
+            self._view.set_output(file_)
+
+    @QtCore.Slot()
+    def run_noice(self):
+        cmd = self._get_cmd()
+        print(cmd)
+        subprocess.Popen(cmd)
+
+    @QtCore.Slot()
     def window_close(self):
         self._save_prefs()
 
     def show(self):
         self._view.show()
 
+    def _get_cmd(self):
+        cmd = ''
+        cmd += '"{}" '.format(os.path.normpath(self._view.get_noice_app()))
+        cmd += '-pr {} '.format(self._view.get_patch_radius())
+        cmd += '-sr {} '.format(self._view.get_search_radius())
+        cmd += '-v {} '.format(self._view.get_variance())
+        cmd += ''.join(['-i "{}" '.format(item) for item in self._model.get_input_list()])
+        cmd += ''.join(['-l "{}" '.format(item) for item in self._model.get_input_list()])
+        cmd += '-o  "{}" '.format(self._view.get_output())
 
+        return cmd

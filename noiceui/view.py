@@ -11,7 +11,7 @@ class NoiceWindow(QtWidgets.QWidget):
     signal_add_aov = QtCore.Signal()
     signal_remove_aov = QtCore.Signal(list)
     signal_add_input = QtCore.Signal()
-    signal_remove_input = QtCore.Signal()
+    signal_remove_input = QtCore.Signal(list)
     signal_browse_output = QtCore.Signal()
     signal_run = QtCore.Signal()
     signal_window_close = QtCore.Signal()
@@ -96,7 +96,7 @@ class NoiceWindow(QtWidgets.QWidget):
 
         self._btn_remove_input = QtWidgets.QPushButton()
         self._btn_remove_input.setIcon(QtGui.QIcon(':/minus_icon'))
-        self._btn_remove_input.clicked.connect(self._signal_aov_removal)
+        self._btn_remove_input.clicked.connect(self._signal_input_removal)
         input_options_layout.addWidget(self._btn_remove_input)
         input_options_layout.setAlignment(self._btn_remove_input, QtCore.Qt.AlignTop)
         layout.addLayout(input_options_layout, 4, 2)
@@ -121,6 +121,10 @@ class NoiceWindow(QtWidgets.QWidget):
     def _signal_aov_removal(self):
         self.signal_remove_aov.emit(self._lst_aovs.selectedIndexes())
 
+    @QtCore.Slot()
+    def _signal_input_removal(self):
+        self.signal_remove_input.emit(self._lst_input.selectedIndexes())
+
     # mutator's
     def set_noice_app(self, value):
         self._txt_noice_app.setText(value)
@@ -140,6 +144,9 @@ class NoiceWindow(QtWidgets.QWidget):
     def set_input_model(self, model):
         self._lst_input.setModel(model)
 
+    def set_output(self, value):
+        self._txt_output.setText(value)
+
     # accessors
     def get_noice_app(self):
         return self._txt_noice_app.text()
@@ -153,6 +160,8 @@ class NoiceWindow(QtWidgets.QWidget):
     def get_variance(self):
         return self._spnb_variance.value()
 
+    def get_output(self):
+        return self._txt_output.text()
 
     def closeEvent(self, *args, **kwargs):
         self.signal_window_close.emit()

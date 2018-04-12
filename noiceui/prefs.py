@@ -74,3 +74,31 @@ class NoicePrefs(object):
             settings.setValue(str(index), item)
 
         settings.endArray()
+
+    @property
+    def inputs(self):
+        aovs = []
+        settings = QtCore.QSettings()
+        for index in range(settings.beginReadArray(constants.PREF_INPUTS)):
+            settings.setArrayIndex(index)
+            aovs.append(settings.value(str(index)))
+
+        return aovs
+
+    @inputs.setter
+    def inputs(self, value):
+        settings = QtCore.QSettings()
+        settings.beginWriteArray(constants.PREF_INPUTS)
+        for index, item in enumerate(value):
+            settings.setArrayIndex(index)
+            settings.setValue(str(index), item)
+
+        settings.endArray()
+
+    @property
+    def output(self):
+        return QtCore.QSettings().value(constants.PREF_OUTPUT)
+
+    @output.setter
+    def output(self, value):
+        QtCore.QSettings().setValue(constants.PREF_OUTPUT, os.path.normpath(value))
