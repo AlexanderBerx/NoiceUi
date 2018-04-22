@@ -27,6 +27,7 @@ class NoiceWindow(QtWidgets.QWidget):
         self.setLayout(layout)
         layout.addWidget(self._create_exe_widget())
         layout.addWidget(self._create_options_widget())
+        layout.addWidget(self._create_progress_widget())
         layout.addWidget(self._create_run_widget())
 
     def _create_exe_widget(self):
@@ -115,6 +116,18 @@ class NoiceWindow(QtWidgets.QWidget):
         self._btn_run = QtWidgets.QPushButton('Run')
         self._btn_run.clicked.connect(self.signal_run)
         return self._btn_run
+
+    def _create_progress_widget(self):
+        widget = QtWidgets.QGroupBox('Progress:')
+        layout = QtWidgets.QVBoxLayout()
+        widget.setLayout(layout)
+
+        #self._txt_log = QtWidgets.QTextEdit()
+        #layout.addWidget(self._txt_log)
+        self._pbar = QtWidgets.QProgressBar()
+        layout.addWidget(self._pbar)
+
+        return widget
 
     # other
     @QtCore.Slot()

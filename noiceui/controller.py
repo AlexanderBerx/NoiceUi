@@ -8,6 +8,8 @@ import subprocess
 from noiceui.view import NoiceWindow
 from noiceui.model import NoiceModel
 from noiceui.prefs import NoicePrefs
+from noiceui.worker import Worker
+
 
 class NoiceController(QtCore.QObject):
     def __init__(self):
@@ -15,6 +17,7 @@ class NoiceController(QtCore.QObject):
         self._view = NoiceWindow()
         self._model = NoiceModel()
         self._prefs = NoicePrefs()
+        self._worker = Worker()
 
         self._load_prefs()
         self._connect_signals()
@@ -33,7 +36,9 @@ class NoiceController(QtCore.QObject):
         self._view.signal_add_input.connect(self.add_input)
         self._view.signal_remove_input[list].connect(self.remove_inputs)
         self._view.signal_browse_output.connect(self.browse_output)
-        self._view.signal_run.connect(self.run_noice)
+        self._view.signal_run.connect(self.run)
+
+        self._worker.singal_done.connect(self.done)
 
     def _load_prefs(self):
         self._view.set_noice_app(self._prefs.noice_app)
@@ -102,10 +107,18 @@ class NoiceController(QtCore.QObject):
             self._view.set_output(file_)
 
     @QtCore.Slot()
-    def run_noice(self):
-        cmd = self._get_cmd()
-        print(cmd)
-        subprocess.Popen(cmd)
+    def run(self):
+        if not self._worker.isRunning():
+            cmd = self._get_cmd()
+            cmd = r'python "C:\Workspace\NoiceUi\noiceui\temp.py"'
+            self._worker.cmd = cmd
+            self._worker.start()
+        else:
+            self._worker.exiting = True
+
+    @QtCore.Slot()
+    def done(self):
+        print('Done with thread')
 
     @QtCore.Slot()
     def window_close(self):
