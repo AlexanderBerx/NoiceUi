@@ -1,22 +1,17 @@
-import sys
-import time
 import subprocess
-import threading
 
 try:
-    from Queue import Queue, Empty
+    from PySide2 import QtCore
 except ImportError:
-    from queue import Queue, Empty  # python 3.x
-
-try:
-    from PySide2 import QtWidgets, QtCore
-except ImportError:
-    from Qt import QtWidgets, QtCore
+    from Qt import QtCore
 
 
 class Worker(QtCore.QThread):
-    singal_done = QtCore.Signal()
+    signal_start = QtCore.Signal()
     signal_output = QtCore.Signal(str)
+    signal_abort = QtCore.Signal()
+    signal_error = QtCore.Signal()
+    singal_complete = QtCore.Signal()
 
     def __init__(self, parent=None):
         super(Worker, self).__init__(parent)
@@ -44,7 +39,9 @@ class Worker(QtCore.QThread):
         super(Worker, self).start(*args, **kwargs)
 
     def run(self):
-        process = subprocess.Popen(self.cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        self.signal_start.emit()
+        process = subprocess.Popen(self.cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT, bufsize=1)
+
         while process.poll() == None and self.exiting == False:
             line = process.stdout.readline()
             if line:
@@ -52,6 +49,8 @@ class Worker(QtCore.QThread):
         else:
             if self.exiting and process.poll()==None:
                 process.kill()
-                sys.stdout.write('aborted')
+                self.signal_abort.emit()
+            elif process.poll() != 0:
+                self.signal_error.emit()
             else:
-                sys.stdout.write('Process completed\n')
+                self.singal_complete.emit()

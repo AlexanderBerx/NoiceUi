@@ -4,7 +4,6 @@ except ImportError:
     from Qt import QtWidgets, QtCore
 
 import os
-import subprocess
 from noiceui.view import NoiceWindow
 from noiceui.model import NoiceModel
 from noiceui.prefs import NoicePrefs
@@ -40,8 +39,12 @@ class NoiceController(QtCore.QObject):
         self._view.signal_run.connect(self.run)
 
         # thread signals
-        self._worker.singal_done.connect(self.done)
         self._worker.signal_output[str].connect(self._worker_output)
+        self._worker.signal_start.connect(self._start)
+        self._worker.signal_abort.connect(self._abort)
+        self._worker.singal_complete.connect(self._complete)
+        self._worker.signal_error.connect(self._error)
+
 
     def _load_prefs(self):
         self._view.set_noice_app(self._prefs.noice_app)
@@ -121,18 +124,43 @@ class NoiceController(QtCore.QObject):
     def run(self):
         if not self._worker.isRunning():
             cmd = self._get_cmd()
-            cmd = r'python "C:\Workspace\NoiceUi\noiceui\temp.py"'
+            # cmd = r'python "C:\Workspace\NoiceUi\noiceui\temp.py"'
             self._worker.cmd = cmd
             self._worker.start()
         else:
             self._worker.exiting = True
 
     @QtCore.Slot()
-    def done(self):
-        print('Done with thread')
+    def _start(self):
+        self._view.set_run_btn_text('Abort')
+        self._view.add_to_log('Started Noice')
+        self._view.toggle_progress()
+
+    @QtCore.Slot()
+    def _complete(self):
+        self._view.set_run_btn_text('Run')
+        self._view.add_to_log('Completed Noice')
+        self._view.toggle_progress(False)
+
+    @QtCore.Slot()
+    def _abort(self):
+        self._view.set_run_btn_text('Run')
+        self._view.add_to_log('Aborted Noice')
+        self._view.toggle_progress(False)
+
+    @QtCore.Slot()
+    def _error(self):
+        self._view.set_run_btn_text('Run')
+        self._view.add_to_log('Error running noice')
+        self._view.toggle_progress(False)
 
     @QtCore.Slot(str)
     def _worker_output(self, line):
+        """
+        :param str line:
+        :return:
+        """
+        line = line.replace('\n', '')
         self._view.add_to_log(line)
 
     def show(self):

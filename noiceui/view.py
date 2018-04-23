@@ -123,8 +123,11 @@ class NoiceWindow(QtWidgets.QWidget):
         widget.setLayout(layout)
 
         self._txt_log = QtWidgets.QTextEdit()
+        self._txt_log.setReadOnly(True)
         layout.addWidget(self._txt_log)
+
         self._pbar = QtWidgets.QProgressBar()
+        self._pbar.setTextVisible(False)
         layout.addWidget(self._pbar)
 
         return widget
@@ -162,6 +165,15 @@ class NoiceWindow(QtWidgets.QWidget):
 
     def add_to_log(self, line):
         self._txt_log.append(line)
+
+    def set_run_btn_text(self, text):
+        self._btn_run.setText(text)
+
+    def toggle_progress(self, on=True):
+        if on:
+            self._pbar.setRange(0, 0)
+        else:
+            self._pbar.setRange(0,1)
 
     # accessors
     def get_noice_app(self):
