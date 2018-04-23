@@ -2,6 +2,12 @@ import sys
 import time
 import subprocess
 import threading
+
+try:
+    from Queue import Queue, Empty
+except ImportError:
+    from queue import Queue, Empty  # python 3.x
+
 try:
     from PySide2 import QtWidgets, QtCore
 except ImportError:
@@ -10,6 +16,7 @@ except ImportError:
 
 class Worker(QtCore.QThread):
     singal_done = QtCore.Signal()
+    signal_output = QtCore.Signal(str)
 
     def __init__(self, parent=None):
         super(Worker, self).__init__(parent)
@@ -39,15 +46,9 @@ class Worker(QtCore.QThread):
     def run(self):
         process = subprocess.Popen(self.cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         while process.poll() == None and self.exiting == False:
-            pass
-            #sys.stdout.write('Running\n')
-            #print process.stdout.readlines()
-            #sys.stdout.write(process.stdout())
-            #if process.returncode:
-            #    print(process.returncode)
-            #if process.returncode:
-            #    sys.stdout.write('exit code: {}'.format(str(process.returncode)))
-            #    self.exiting = True
+            line = process.stdout.readline()
+            if line:
+                self.signal_output.emit(line)
         else:
             if self.exiting and process.poll()==None:
                 process.kill()

@@ -28,6 +28,7 @@ class NoiceController(QtCore.QObject):
         self._view.set_input_model(self._model.input_model)
 
     def _connect_signals(self):
+        # ui signals
         self._view.signal_browse_noice_app.connect(self.browse_noice_app)
         self._view.signal_reset.connect(self.reset)
         self._view.signal_add_aov.connect(self.add_aov)
@@ -38,7 +39,9 @@ class NoiceController(QtCore.QObject):
         self._view.signal_browse_output.connect(self.browse_output)
         self._view.signal_run.connect(self.run)
 
+        # thread signals
         self._worker.singal_done.connect(self.done)
+        self._worker.signal_output[str].connect(self._worker_output)
 
     def _load_prefs(self):
         self._view.set_noice_app(self._prefs.noice_app)
@@ -63,7 +66,7 @@ class NoiceController(QtCore.QObject):
         self._prefs.inputs = self._model.get_input_list()
         self._prefs.output = self._view.get_output()
 
-    # slots
+    # ui slots
     @QtCore.Slot()
     def browse_noice_app(self):
         file_, _ = QtWidgets.QFileDialog.getOpenFileName(self._view, 'Set Noice app')
@@ -107,6 +110,14 @@ class NoiceController(QtCore.QObject):
             self._view.set_output(file_)
 
     @QtCore.Slot()
+    def window_close(self):
+        if self._worker.isRunning():
+            self._worker.terminate()
+
+        self._save_prefs()
+
+    # thread slots
+    @QtCore.Slot()
     def run(self):
         if not self._worker.isRunning():
             cmd = self._get_cmd()
@@ -120,9 +131,9 @@ class NoiceController(QtCore.QObject):
     def done(self):
         print('Done with thread')
 
-    @QtCore.Slot()
-    def window_close(self):
-        self._save_prefs()
+    @QtCore.Slot(str)
+    def _worker_output(self, line):
+        self._view.add_to_log(line)
 
     def show(self):
         self._view.show()

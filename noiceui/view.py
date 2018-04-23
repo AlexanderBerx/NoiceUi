@@ -122,8 +122,8 @@ class NoiceWindow(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout()
         widget.setLayout(layout)
 
-        #self._txt_log = QtWidgets.QTextEdit()
-        #layout.addWidget(self._txt_log)
+        self._txt_log = QtWidgets.QTextEdit()
+        layout.addWidget(self._txt_log)
         self._pbar = QtWidgets.QProgressBar()
         layout.addWidget(self._pbar)
 
@@ -159,6 +159,9 @@ class NoiceWindow(QtWidgets.QWidget):
 
     def set_output(self, value):
         self._txt_output.setText(value)
+
+    def add_to_log(self, line):
+        self._txt_log.append(line)
 
     # accessors
     def get_noice_app(self):
