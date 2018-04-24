@@ -1,6 +1,6 @@
 import os
 import platform
-from Qt import QtWidgets, QtCore
+from Qt import QtCore
 from noiceui import constants
 
 

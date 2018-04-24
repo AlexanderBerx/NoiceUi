@@ -1,4 +1,4 @@
-from Qt import QtCore, QtGui
+from Qt import QtGui
 
 
 class NoiceModel(object):

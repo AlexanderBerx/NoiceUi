@@ -38,12 +38,12 @@ class Worker(QtCore.QThread):
         self.signal_start.emit()
         process = subprocess.Popen(self.cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1)
 
-        while process.poll() == None and self.exiting == False:
+        while process.poll() is None and not self.exiting:
             line = process.stdout.readline()
             if line:
                 self.signal_output.emit(line)
         else:
-            if self.exiting and process.poll() == None:
+            if self.exiting and not process.poll():
                 process.kill()
                 self.signal_abort.emit()
             elif process.poll() != 0:
