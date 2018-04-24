@@ -1,9 +1,5 @@
 import subprocess
-
-try:
-    from PySide2 import QtCore
-except ImportError:
-    from Qt import QtCore
+from Qt import QtCore
 
 
 class Worker(QtCore.QThread):
@@ -40,14 +36,14 @@ class Worker(QtCore.QThread):
 
     def run(self):
         self.signal_start.emit()
-        process = subprocess.Popen(self.cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT, bufsize=1)
+        process = subprocess.Popen(self.cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1)
 
         while process.poll() == None and self.exiting == False:
             line = process.stdout.readline()
             if line:
                 self.signal_output.emit(line)
         else:
-            if self.exiting and process.poll()==None:
+            if self.exiting and process.poll() == None:
                 process.kill()
                 self.signal_abort.emit()
             elif process.poll() != 0:

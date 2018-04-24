@@ -1,13 +1,9 @@
-try:
-    from PySide2 import QtWidgets, QtCore, QtGui
-except ImportError:
-    from Qt import QtWidgets, QtCore, QtGui
+from Qt import QtWidgets, QtCore, QtGui
 
 
 class NoiceWindow(QtWidgets.QWidget):
     TITLE = 'NoiceUi'
     signal_browse_noice_app = QtCore.Signal()
-    signal_reset = QtCore.Signal()
     signal_add_aov = QtCore.Signal()
     signal_remove_aov = QtCore.Signal(list)
     signal_add_input = QtCore.Signal()
@@ -49,12 +45,6 @@ class NoiceWindow(QtWidgets.QWidget):
         widget = QtWidgets.QGroupBox('Options:')
         layout = QtWidgets.QGridLayout()
         widget.setLayout(layout)
-
-        self._btn_reset = QtWidgets.QPushButton()
-        self._btn_reset.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_BrowserReload))
-        self._btn_reset.clicked.connect(self.signal_reset)
-
-        layout.addWidget(self._btn_reset, 0, 3)
 
         layout.addWidget(QtWidgets.QLabel('Patch radius:'), 0, 0)
         self._spnb_patch_radius = QtWidgets.QSpinBox()
@@ -169,11 +159,14 @@ class NoiceWindow(QtWidgets.QWidget):
     def set_run_btn_text(self, text):
         self._btn_run.setText(text)
 
-    def toggle_progress(self, on=True):
-        if on:
+    def toggle_run_btn(self, toggle=True):
+        self._btn_run.setEnabled(toggle)
+
+    def toggle_progress(self, toggle=True):
+        if toggle:
             self._pbar.setRange(0, 0)
         else:
-            self._pbar.setRange(0,1)
+            self._pbar.setRange(0, 1)
 
     # accessors
     def get_noice_app(self):
@@ -194,6 +187,3 @@ class NoiceWindow(QtWidgets.QWidget):
     def closeEvent(self, *args, **kwargs):
         self.signal_window_close.emit()
         super(NoiceWindow, self).closeEvent(*args, **kwargs)
-
-
-
