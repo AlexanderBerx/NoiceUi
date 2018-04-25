@@ -2,6 +2,9 @@ from Qt import QtWidgets, QtCore, QtGui
 
 
 class NoiceWindow(QtWidgets.QWidget):
+    """
+    NoiceWindow, inherits from QWidget
+    """
     TITLE = 'NoiceUi'
     signal_browse_noice_app = QtCore.Signal()
     signal_add_aov = QtCore.Signal()
@@ -17,8 +20,11 @@ class NoiceWindow(QtWidgets.QWidget):
         self._init_window()
 
     def _init_window(self):
+        """
+        initialise the ui
+        :return: None
+        """
         self.setWindowTitle(self.TITLE)
-
         layout = QtWidgets.QVBoxLayout()
         self.setLayout(layout)
         layout.addWidget(self._create_exe_widget())
@@ -27,6 +33,10 @@ class NoiceWindow(QtWidgets.QWidget):
         layout.addWidget(self._create_run_widget())
 
     def _create_exe_widget(self):
+        """
+        creates and returns a widget for the noice app to connect to
+        :return: QtWidgets.QWidget
+        """
         widget = QtWidgets.QGroupBox('Noice App:')
         layout = QtWidgets.QHBoxLayout()
         widget.setLayout(layout)
@@ -42,6 +52,10 @@ class NoiceWindow(QtWidgets.QWidget):
         return widget
 
     def _create_options_widget(self):
+        """
+        creates and returns a widget for the noice options
+        :return: QtWidgets.QWidget
+        """
         widget = QtWidgets.QGroupBox('Options:')
         layout = QtWidgets.QGridLayout()
         widget.setLayout(layout)
@@ -103,11 +117,19 @@ class NoiceWindow(QtWidgets.QWidget):
         return widget
 
     def _create_run_widget(self):
+        """
+        creates and returns a widget for the run widget
+        :return: QtWidgets.QWidget
+        """
         self._btn_run = QtWidgets.QPushButton('Run')
         self._btn_run.clicked.connect(self.signal_run)
         return self._btn_run
 
     def _create_progress_widget(self):
+        """
+        creates and returns a widget for the progress widget
+        :return: QtWidgets.QWidget
+        """
         widget = QtWidgets.QGroupBox('Progress:')
         layout = QtWidgets.QVBoxLayout()
         widget.setLayout(layout)
@@ -125,44 +147,107 @@ class NoiceWindow(QtWidgets.QWidget):
     # other
     @QtCore.Slot()
     def _signal_aov_removal(self):
+        """
+        Slot, emits the the indexes of the selected aovs with the signal_remove_aov signal
+        :return: None
+        """
         self.signal_remove_aov.emit(self._lst_aovs.selectedIndexes())
 
     @QtCore.Slot()
     def _signal_input_removal(self):
+        """
+        Slot, emits the the indexes of the selected inputs with the signal_remove_input signal
+        :return: None
+        """
         self.signal_remove_input.emit(self._lst_input.selectedIndexes())
 
     # mutator's
     def set_noice_app(self, value):
+        """
+        sets the path to the noice app
+        :param str value: file path
+        :return: None
+        """
         self._txt_noice_app.setText(value)
 
     def set_patch_radius(self, value):
+        """
+        sets the patch radius
+        :param int value: patch radius
+        :return: None
+        """
         self._spnb_patch_radius.setValue(int(value))
 
     def set_search_radius(self, value):
+        """
+        sets the search radius
+        :param int value: search radius
+        :return: None
+        """
         return self._spnb_search_radius.setValue(int(value))
 
     def set_variance(self, value):
+        """
+        sets the variance
+        :param float value: variance
+        :return: None
+        """
         return self._spnb_variance.setValue(float(value))
 
     def set_aov_model(self, model):
+        """
+        sets the aov model
+        :param QtGui.QStandardItemModel model:
+        :return: None
+        """
         self._lst_aovs.setModel(model)
 
     def set_input_model(self, model):
+        """
+        sets the input model
+        :param QtGui.QStandardItemModel model:
+        :return: None
+        """
         self._lst_input.setModel(model)
 
     def set_output(self, value):
+        """
+        sets the output file
+        :param str value: file path
+        :return: None
+        """
         self._txt_output.setText(value)
 
     def add_to_log(self, line):
+        """
+        adds to to the log
+        :param str line:
+        :return: None
+        """
         self._txt_log.append(line)
 
     def set_run_btn_text(self, text):
+        """
+        sets the run button text
+        :param str text:
+        :return: None
+        """
         self._btn_run.setText(text)
 
     def toggle_run_btn(self, toggle=True):
+        """
+        enables or disables the run button
+        :param bool toggle:
+        :return: None
+        """
         self._btn_run.setEnabled(toggle)
 
     def toggle_progress(self, toggle=True):
+        """
+        toggles the progress bar, if on the process bar will run infinitely
+        :param bool toggle:
+        :return: None
+        """
         if toggle:
             self._pbar.setRange(0, 0)
         else:
@@ -170,20 +255,47 @@ class NoiceWindow(QtWidgets.QWidget):
 
     # accessors
     def get_noice_app(self):
+        """
+        returns the path to the noice app
+        :return: txt
+        """
         return self._txt_noice_app.text()
 
     def get_patch_radius(self):
+        """
+        returns the patch radius
+        :return: int
+        """
         return self._spnb_patch_radius.value()
 
     def get_search_radius(self):
+        """
+        returns the search radius
+        :return: int
+        """
         return self._spnb_search_radius.value()
 
     def get_variance(self):
+        """
+        returns the variance
+        :return: float
+        """
         return self._spnb_variance.value()
 
     def get_output(self):
+        """
+        returns the output path
+        :return: str
+        """
         return self._txt_output.text()
 
     def closeEvent(self, *args, **kwargs):
+        """
+        overwritten func from QWidget, emits signal_window_close signal before calling
+        the original func
+        :param args:
+        :param kwargs:
+        :return: None
+        """
         self.signal_window_close.emit()
         super(NoiceWindow, self).closeEvent(*args, **kwargs)
